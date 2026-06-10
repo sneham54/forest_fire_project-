@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Forest Fire AI Simulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #ffffff;
+        }
+        h1 {
+            font-size: 32px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+        }
+        pre {
+            background: #f2f2f2;
+            padding: 10px;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: scroll;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #0055cc;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔥 Forest Fire Prediction & Simulation</h1>
+
+    <button onclick="predictFire()">🔍 Predict Fire Risk</button>
+    <button onclick="simulateFire()">🔥 Simulate Fire Spread</button>
+    <a href="/map" target="_blank">🌍 View Fire Risk Map</a>
+
+    <h2>Fire Risk Map (Values 0 = Low, 1 = High):</h2>
+    <pre id="prediction"></pre>
+
+    <h2>Simulated Fire Spread:</h2>
+    <pre id="simulation"></pre>
+
+    <script>
+        function predictFire() {
+            fetch("/predict", { method: "POST" })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("prediction").textContent =
+                        JSON.stringify(data.prediction, null, 2);
+                })
+                .catch(error => alert("Prediction error: " + error));
+        }
+
+        function simulateFire() {
+            const raw = document.getElementById("prediction").textContent;
+            if (!raw) {
+                alert("Please run prediction first!");
+                return;
+            }
+            const fireMap = JSON.parse(raw);
+            fetch("/simulate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ fire_map: fireMap })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("simulation").textContent =
+                        JSON.stringify(data.simulation, null, 2);
+                })
+                .catch(error => alert("Simulation error: " + error));
+        }
+    </script>
+</body>
+</html>
+
+    
